@@ -12,7 +12,7 @@ int main() {
   Tl::initTerminal();
   
   utils::ClearScreen();
-  std::cout <<"Welcome to anti version " << version <<"\r"<<std::flush;  
+  std::cout <<"Welcome to anti version " << version <<"\n\n\r"<<std::flush;  
   while (true){
    KeyPress::ProcessKeyPress();
   }

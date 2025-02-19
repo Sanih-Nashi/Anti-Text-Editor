@@ -6,6 +6,7 @@
 #include <termio.h>
 
 #define CTRL_KEY(x) ((x) & 0x1f)
+#define DEL_KEY 127
 
 namespace utils{
   
