@@ -9,7 +9,7 @@ const float version = 1.0;
 
 int main() {
   RawMode::enableRawMode();
-  Tl::initTerminal();
+  initTerminal();
   
   utils::ClearScreen();
   std::cout <<"Welcome to anti version " << version <<"\n\n\r"<<std::flush;  

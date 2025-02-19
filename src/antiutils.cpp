@@ -1,8 +1,6 @@
 #include "antiutils.h"
 
 
-struct utils::Terminal ter;
-
 void utils::die(const char* errormsg)
 {
 

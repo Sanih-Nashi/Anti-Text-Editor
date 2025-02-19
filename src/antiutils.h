@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <termio.h>
 
+#include <vector>
+
 #define CTRL_KEY(x) ((x) & 0x1f)
 #define DEL_KEY 127
 
@@ -22,6 +24,4 @@ namespace utils{
   void ClearScreen();
 };
 
-
-
-extern struct utils::Terminal ter;
+inline struct utils::Terminal ter;
