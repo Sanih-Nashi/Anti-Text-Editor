@@ -1,5 +1,8 @@
 #include <errno.h>
 
+#include <utility>
+#include <iostream>
+
 #include "KeyProcess.h"
 #include "antiutils.h"
 #include "terminal.h"
@@ -27,6 +30,7 @@ void KeyPress::ProcessKeyPress(){
   {
     used_col[current_col] = true;
     write(STDOUT_FILENO, &c, 1);
+    changes[current_col] = std::make_pair(current_row, c);
   }
 
   switch(c){
@@ -37,6 +41,12 @@ void KeyPress::ProcessKeyPress(){
       write(STDOUT_FILENO, "\x1b[H", 3);
 
       exit(0);
+    }
+    case CTRL_KEY('s'): 
+    {
+      std::cout <<current_col <<", " <<current_row;
+      utils::CommitChanges();
+      break;
     }
 
     case CTRL_KEY('i'): 
@@ -72,17 +82,20 @@ void KeyPress::ProcessKeyPress(){
     case CTRL_KEY('j'): 
     {
       write(STDOUT_FILENO, "\b", 1);
+      current_row--;
       break;
     }
     case CTRL_KEY('l'): 
     {
       write(STDOUT_FILENO, "\033[C", 3);
+      current_row++;
       break;
     }
 
     case DEL_KEY: 
     {
       write(STDOUT_FILENO, "\b \b", 3);
+      current_row--;
       break;
     }
 

@@ -6,6 +6,7 @@
 #include <termio.h>
 
 #include <vector>
+#include <string>
 
 #define CTRL_KEY(x) ((x) & 0x1f)
 #define DEL_KEY 127
@@ -20,6 +21,8 @@ namespace utils{
 
   };
 
+  std::string GetSpecificLine(const std::string &file_path, int target_line);
+  void CommitChanges();
   void die(const char* errormsg);
   void ClearScreen();
 };

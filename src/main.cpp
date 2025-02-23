@@ -6,8 +6,10 @@
 #include <iostream>
 
 const float version = 1.0;
+bool test = true;
 
 int main() {
+  if (test)
   RawMode::enableRawMode();
   initTerminal();
   
