@@ -10,6 +10,8 @@
 
 #define CTRL_KEY(x) ((x) & 0x1f)
 #define DEL_KEY 127
+#define ENTER_KEY 13
+
 
 namespace utils{
   
@@ -21,7 +23,7 @@ namespace utils{
 
   };
 
-  std::string GetSpecificLine(const std::string &file_path, int target_line);
+  std::string GetSpecificLine(const int& target_line, std::ifstream& file);
   void CommitChanges();
   void die(const char* errormsg);
   void ClearScreen();

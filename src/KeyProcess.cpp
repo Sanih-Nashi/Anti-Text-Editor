@@ -28,9 +28,10 @@ void KeyPress::ProcessKeyPress(){
 
   if (31 < c && c < 127)
   {
+    current_row++;
     used_col[current_col] = true;
     write(STDOUT_FILENO, &c, 1);
-    changes[current_col] = std::make_pair(current_row, c);
+    changes.push_back(std::make_pair(current_col, std::make_pair(current_row, c)));
   }
 
   switch(c){
@@ -44,7 +45,6 @@ void KeyPress::ProcessKeyPress(){
     }
     case CTRL_KEY('s'): 
     {
-      std::cout <<current_col <<", " <<current_row;
       utils::CommitChanges();
       break;
     }
@@ -99,5 +99,12 @@ void KeyPress::ProcessKeyPress(){
       break;
     }
 
+    case ENTER_KEY:
+    {
+      write(STDOUT_FILENO, "\n\r", 2);
+      changes.push_back(std::make_pair(current_col, std::make_pair(current_row, '\n')));
+      break;
+    }
+      
   }
 }
