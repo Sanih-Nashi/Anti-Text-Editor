@@ -22,7 +22,7 @@ namespace utils{
     struct termios orig_setting;
 
   };
-
+  
   std::string GetSpecificLine(const int& target_line, std::ifstream& file);
   void CommitChanges();
   void die(const char* errormsg);

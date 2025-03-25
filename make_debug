@@ -1,6 +1,6 @@
 
 CC = g++
-CFLAGS =-fsanitize=address -fdiagnostics-color=always -O3 -std=c++23
+CFLAGS =-fsanitize=address -fdiagnostics-color=always -g -std=c++23
 # Source files (find all .cpp files recursively from the src directory)
 SOURCES = $(shell find src -name "*.cpp")
 

@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <iostream>
+#include <string>
 
 #include "KeyProcess.h"
 #include "antiutils.h"
@@ -30,8 +31,12 @@ void KeyPress::ProcessKeyPress(){
   {
     current_row++;
     used_col[current_col] = true;
-    write(STDOUT_FILENO, &c, 1);
-    changes.push_back(std::make_pair(current_col, std::make_pair(current_row, c)));
+    lines[current_col].insert(current_row - 1, std::string(1, c));
+    write(STDOUT_FILENO, "\r", 1);
+    write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
+    write(STDOUT_FILENO, "\r", 1);
+    std::string str = "\033[" + std::to_string(current_row) + "C";
+    write(STDOUT_FILENO, str.c_str(), str.size());
   }
 
   switch(c){
@@ -49,37 +54,43 @@ void KeyPress::ProcessKeyPress(){
       break;
     }
 
-    case CTRL_KEY('i'): 
+    case CTRL_KEY('k'): 
     {
       if (current_col > 0)
       {
-        if (used_col[current_col - 1])
+        if (current_row <= lines[current_col - 1].size())
           write(STDOUT_FILENO, "\033[1A", 4);
 
         else
+        {
           write(STDOUT_FILENO, "\033[1A\r", 5);
+          current_row = 0;
+        }
 
         current_col--;
       }
       break;
     }
-    case CTRL_KEY('k'): 
+    case CTRL_KEY('j'): 
     {
 
-      if (current_col <= Tl::GetTerminalColumn())
+      if (current_col < Tl::GetTerminalColumn() && current_col < lines.size() - 1)
       {
         
-        if (used_col[current_col + 1])
+        if (current_row < lines[current_col + 1].size()) 
           write(STDOUT_FILENO, "\n", 1);
 
         else
+        {
           write(STDOUT_FILENO, "\n\r", 2);
+          current_row = 0;
+        }
 
         current_col++;
       }
       break;
     }
-    case CTRL_KEY('j'): 
+    case CTRL_KEY('h'): 
     {
       write(STDOUT_FILENO, "\b", 1);
       current_row--;
@@ -87,22 +98,26 @@ void KeyPress::ProcessKeyPress(){
     }
     case CTRL_KEY('l'): 
     {
-      write(STDOUT_FILENO, "\033[C", 3);
-      current_row++;
+      if (current_row < lines[current_col].size())
+      {
+        write(STDOUT_FILENO, "\033[C", 3);
+	      current_row++;
+      }
       break;
     }
 
     case DEL_KEY: 
     {
-      write(STDOUT_FILENO, "\b \b", 3);
-      current_row--;
+      lines[current_col].erase(current_row--, 1);
+      write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
       break;
     }
 
     case ENTER_KEY:
     {
       write(STDOUT_FILENO, "\n\r", 2);
-      changes.push_back(std::make_pair(current_col, std::make_pair(current_row, '\n')));
+      lines.insert(lines.begin() + current_col, &c);
+      current_col++;
       break;
     }
       
