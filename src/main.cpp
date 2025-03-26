@@ -1,6 +1,6 @@
 #include "antiutils.h"
-#include "RawMode.h"
-#include "KeyProcess.h"
+#include "rawMode.h"
+#include "keyProcess.h"
 #include "terminal.h"
 
 #include <iostream>

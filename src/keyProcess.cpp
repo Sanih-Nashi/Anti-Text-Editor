@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "KeyProcess.h"
+#include "keyProcess.h"
 #include "antiutils.h"
 #include "terminal.h"
 

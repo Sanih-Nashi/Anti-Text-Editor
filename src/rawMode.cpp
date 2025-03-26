@@ -1,4 +1,4 @@
-#include "RawMode.h"
+#include "rawMode.h"
 #include "antiutils.h"
 
 void RawMode::disableRawMode(){
