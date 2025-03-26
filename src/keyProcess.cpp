@@ -77,13 +77,15 @@ void KeyPress::ProcessKeyPress(){
       if (current_col < Tl::GetTerminalColumn() && current_col < lines.size() - 1)
       {
         
-        if (current_row < lines[current_col + 1].size()) 
+        if (current_row <= lines[current_col + 1].size()) 
           write(STDOUT_FILENO, "\n", 1);
 
         else
         {
           write(STDOUT_FILENO, "\n\r", 2);
-          current_row = 0;
+	  std::string num = "\033[" + std::to_string(lines[current_col + 1].size()) + "C";
+          write(STDOUT_FILENO, num.c_str(), num.size());
+          current_row = lines[current_col + 1].size();
         }
 
         current_col++;
@@ -92,8 +94,11 @@ void KeyPress::ProcessKeyPress(){
     }
     case CTRL_KEY('h'): 
     {
-      write(STDOUT_FILENO, "\b", 1);
-      current_row--;
+      if (current_row > 0)
+      {
+        write(STDOUT_FILENO, "\b", 1);
+        current_row--;
+      }
       break;
     }
     case CTRL_KEY('l'): 
@@ -118,6 +123,17 @@ void KeyPress::ProcessKeyPress(){
         std::string row = "\033[" + std::to_string(--current_row) + "C";
         write(STDOUT_FILENO, row.c_str(), row.size());
       }
+      else
+      {  
+        if (current_col != 0)
+	{
+	  write(STDOUT_FILENO, "\033[A", 3);
+	  std::string num = "\033[" + std::to_string(lines[current_col - 1].size()) + "C";
+          write(STDOUT_FILENO, num.c_str(), num.size());
+          current_row = lines[current_col - 1].size();
+	  current_col--;
+	}
+      }  
       break;
     }
 
