@@ -107,9 +107,17 @@ void KeyPress::ProcessKeyPress(){
     }
 
     case DEL_KEY: 
-    {
-      lines[current_col].erase(current_row--, 1);
-      write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
+    { 
+      if (current_row != 0)
+      {
+        lines[current_col].erase(current_row - 1, 1);
+        write(STDOUT_FILENO, "\r", 1);
+        write(STDOUT_FILENO, "\033[K", 3);
+        write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
+        write(STDOUT_FILENO, "\r", 1);
+        std::string row = "\033[" + std::to_string(--current_row) + "C";
+        write(STDOUT_FILENO, row.c_str(), row.size());
+      }
       break;
     }
 
