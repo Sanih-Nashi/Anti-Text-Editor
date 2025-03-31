@@ -151,7 +151,7 @@ void KeyPress::ProcessKeyPress(){
 	    write(STDOUT_FILENO, "\n\r\033[K", 5);
 	    write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
 	  }        
-	    std::string num2 = "\033[" + std::to_string(lines.size() - current_col) + "A";
+	    std::string num2 = "\033[" + std::to_string((lines.size() + 1) - current_col) + "A";
 	    write(STDOUT_FILENO, "\n\033\r[K", 5);
 	    write(STDOUT_FILENO, num2.c_str(), num2.size());
 	    write(STDOUT_FILENO, num.c_str(), num.size());
@@ -163,9 +163,18 @@ void KeyPress::ProcessKeyPress(){
 
     case ENTER_KEY:
     {
-      write(STDOUT_FILENO, "\n\r", 2);
-      lines.insert(lines.begin() + current_col, &c);
-      current_col++;
+      lines.insert(lines.begin() + current_col++, &c);
+
+      write(STDOUT_FILENO, "\033[K", 3);
+      for (int i = current_col; i < lines.size(); i++)
+      {
+        write(STDOUT_FILENO, "\n\r\033[K", 5);
+        write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
+      }        
+      std::string num = "\033[" + std::to_string(lines.size() - current_col) + "A";
+      write(STDOUT_FILENO, "\n\033\r[K", 5);
+      write(STDOUT_FILENO, num.c_str(), num.size());
+
       break;
     }
       
