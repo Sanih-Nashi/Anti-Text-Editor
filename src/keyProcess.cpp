@@ -116,7 +116,7 @@ void KeyPress::ProcessKeyPress(){
       if (current_row < lines[current_col].size())
       {
         write(STDOUT_FILENO, "\033[C", 3);
-	current_row++;
+	      current_row++;
       }
       break;
     }
@@ -128,36 +128,39 @@ void KeyPress::ProcessKeyPress(){
         lines[current_col].erase(--current_row, 1);
         write(STDOUT_FILENO, "\r\033[K", 4);
         write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
-	write(STDOUT_FILENO, "\r", 1);
-	if (current_row != 0){
+  	    write(STDOUT_FILENO, "\r", 1);
+	      if (current_row != 0){
           std::string row = "\033[" + std::to_string(current_row) + "C";
           write(STDOUT_FILENO, row.c_str(), row.size());
         } 	
       }
+
       else
       {  
         if (current_col != 0)
-	{
+        {
+          int size = lines[current_col - 1].size();
+          std::string num = "\033[" + std::to_string(size) + "C";
+          lines[current_col - 1] = lines[current_col - 1] + lines[current_col];
+          lines.erase(lines.begin() + current_col--);
+          current_row = size;
 
-	  std::string num = "\033[" + std::to_string(lines[current_col - 1].size()) + "C";
-	  lines[current_col - 1] = lines[current_col - 1] + lines[current_col];
-	  lines.erase(lines.begin() + current_col--);
-          current_row = lines[current_col].size() - 1;
+          write(STDOUT_FILENO, "\033[A", 3);
+          write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
 
-	  write(STDOUT_FILENO, "\033[A", 3);
-	  write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
+          for (int i = current_col + 1; i < lines.size(); i++){
+            write(STDOUT_FILENO, "\n\r\033[K", 5);
+            write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
+          }      
 
-	  for (int i = current_col + 1; i < lines.size(); i++){
-	    write(STDOUT_FILENO, "\n\r\033[K", 5);
-	    write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
-	  }        
-	    std::string num2 = "\033[" + std::to_string((lines.size() + 1) - current_col) + "A";
-	    write(STDOUT_FILENO, "\n\033\r[K", 5);
-	    write(STDOUT_FILENO, num2.c_str(), num2.size());
-	    write(STDOUT_FILENO, num.c_str(), num.size());
+          std::string num2 = "\033[" + std::to_string((lines.size() + 1) - current_col) + "A";
+          write(STDOUT_FILENO, "\n\033\r[K", 5);
+          write(STDOUT_FILENO, num2.c_str(), num2.size());
+          write(STDOUT_FILENO, num.c_str(), num.size());
 
-	}
-      }  
+
+        }  
+      }
       break;
     }
 
