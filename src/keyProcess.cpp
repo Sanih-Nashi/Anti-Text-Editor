@@ -163,18 +163,20 @@ void KeyPress::ProcessKeyPress(){
 
     case ENTER_KEY:
     {
-      lines.insert(lines.begin() + current_col++, &c);
+      lines.insert(lines.begin() + current_col, lines[current_col].substr(0, current_row));
+      lines[current_col + 1] = lines[current_col + 1].substr(current_row, lines[current_col + 1].size() - 1);
 
       write(STDOUT_FILENO, "\033[K", 3);
-      for (int i = current_col; i < lines.size(); i++)
+      for (int i = current_col + 1; i < lines.size(); i++)
       {
         write(STDOUT_FILENO, "\n\r\033[K", 5);
         write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
       }        
-      std::string num = "\033[" + std::to_string(lines.size() - current_col) + "A";
-      write(STDOUT_FILENO, "\n\033\r[K", 5);
+      std::string num = "\033[" + std::to_string(lines.size() - current_col -1) + "A";
+      write(STDOUT_FILENO, "\n\r\033[K", 5);
       write(STDOUT_FILENO, num.c_str(), num.size());
-
+      current_col++;
+      current_row = 0;
       break;
     }
       
