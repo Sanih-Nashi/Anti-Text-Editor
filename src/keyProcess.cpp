@@ -61,12 +61,15 @@ void KeyPress::ProcessKeyPress(){
       if (current_col > 0)
       {
         if (current_row <= lines[current_col - 1].size())
-          write(STDOUT_FILENO, "\033[1A", 4);
+          write(STDOUT_FILENO, "\033[A", 3);
 
         else
         {
-          write(STDOUT_FILENO, "\033[1A\r", 5);
-          current_row = 0;
+	  char str[11];
+	  int size = lines[current_col - 1].size();
+	  int len = snprintf(str, sizeof(str), "\033[A\r\033[%dC", size);
+          write(STDOUT_FILENO, str, len);
+          current_row = size;
         }
 
         current_col--;
@@ -92,8 +95,8 @@ void KeyPress::ProcessKeyPress(){
 	    write(STDOUT_FILENO, str, len);
 	  }
 	  else
-          {
-            write(STDOUT_FILENO, "\n\r", 2);
+    {
+      write(STDOUT_FILENO, "\n\r", 2);
 	  }
 
 	  current_row = lines[current_col + 1].size();
@@ -130,8 +133,10 @@ void KeyPress::ProcessKeyPress(){
         write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
   	    write(STDOUT_FILENO, "\r", 1);
 	      if (current_row != 0){
-          std::string row = "\033[" + std::to_string(current_row) + "C";
-          write(STDOUT_FILENO, row.c_str(), row.size());
+          // std::string row = "\033[" + std::to_string(current_row) + "C";
+          char str[7];
+          int len = snprintf(str, sizeof(str), "\033[%dC", current_row); 
+          write(STDOUT_FILENO, str, len);
         } 	
       }
 
@@ -140,7 +145,9 @@ void KeyPress::ProcessKeyPress(){
         if (current_col != 0)
         {
           int size = lines[current_col - 1].size();
-          std::string num = "\033[" + std::to_string(size) + "C";
+          // std::string num = "\033[" + std::to_string(size) + "C";
+          char str[7];
+          int len = snprintf(str, sizeof(str), "\033[%dC", size); 
           lines[current_col - 1] = lines[current_col - 1] + lines[current_col];
           lines.erase(lines.begin() + current_col--);
           current_row = size;
@@ -153,10 +160,12 @@ void KeyPress::ProcessKeyPress(){
             write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
           }      
 
-          std::string num2 = "\033[" + std::to_string((lines.size() + 1) - current_col) + "A";
+          // std::string num2 = "\033[" + std::to_string((lines.size() + 1) - current_col) + "A";
+          char str2[7];
+          int len2 = snprintf(str2, sizeof(str2), "\033[%dA", lines.size() + 1); 
           write(STDOUT_FILENO, "\n\033\r[K", 5);
-          write(STDOUT_FILENO, num2.c_str(), num2.size());
-          write(STDOUT_FILENO, num.c_str(), num.size());
+          write(STDOUT_FILENO, str2, len2);
+          write(STDOUT_FILENO, str, len);
 
 
         }  
@@ -175,9 +184,11 @@ void KeyPress::ProcessKeyPress(){
         write(STDOUT_FILENO, "\n\r\033[K", 5);
         write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
       }        
-      std::string num = "\033[" + std::to_string(lines.size() - current_col -1) + "A";
+      // std::string num = "\033[" + std::to_string(lines.size() - current_col -1) + "A";
+      char str[7];
+      int len = snprintf(str, sizeof(str), "\033[%dA", lines.size() - current_col - 1); 
       write(STDOUT_FILENO, "\n\r\033[K", 5);
-      write(STDOUT_FILENO, num.c_str(), num.size());
+      write(STDOUT_FILENO, str, len);
       current_col++;
       current_row = 0;
       break;
