@@ -31,7 +31,6 @@ void KeyPress::ProcessKeyPress(){
   if (31 < c && c < 127)
   {
     current_row++;
-    used_col[current_col] = true;
     lines[current_col].insert(current_row - 1, std::string(1, c));
     write(STDOUT_FILENO, "\r", 1);
     write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());

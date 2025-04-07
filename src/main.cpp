@@ -7,10 +7,10 @@
 
 const float version = 1.0;
 
-int main() {
+int main(int argc, char** argv) {
   RawMode::enableRawMode();
   utils::ClearScreen();
-  initTerminal();
+  initTerminal(&argv, argc);
   while (true){
    KeyPress::ProcessKeyPress();
   }

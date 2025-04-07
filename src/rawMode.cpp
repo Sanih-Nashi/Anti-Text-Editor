@@ -1,7 +1,9 @@
 #include "rawMode.h"
 #include "antiutils.h"
 
-void RawMode::disableRawMode(){
+void RawMode::disableRawMode()
+{
+  write(STDOUT_FILENO, "\033[40m\033[0m", 9);
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH ,&ter.orig_setting) == -1)
     utils::die("tcsetattr");
 }

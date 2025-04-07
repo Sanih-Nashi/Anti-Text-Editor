@@ -41,15 +41,24 @@ int Tl::GetTerminalSize(int& row, int& column){
 }
 
 
-void initTerminal() {
-  used_col[0] = true;
-  
+void initTerminal(char*** argv, const int& argc) {
+    
   if (Tl::GetTerminalSize(ter.row, ter.column) == -1) 
     utils::die("getWindowSize");
   ter.cx = 0;
   ter.cy = 0;
   
-  std::ifstream file_in("test.txt");
+  if (argc < 2)
+  {
+    is_file_mentioned = false;
+    lines.push_back(std::string(""));
+    return;
+  }
+
+  is_file_mentioned = true;
+  file_name = (*argv)[1];
+  std::ifstream file_in(file_name);
+
   if (!file_in.is_open())
   {
     std::cout <<"error opening file";

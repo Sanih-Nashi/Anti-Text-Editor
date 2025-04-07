@@ -12,9 +12,10 @@ namespace Tl{
   int GetTerminalColumn();
   int GetTerminalSize(int& row, int& column);
 }
-void initTerminal();
+void initTerminal(char ***argv, const int& argc);
 
 inline std::vector<std::string> lines;
-inline std::vector<bool> used_col(Tl::GetTerminalColumn() ,false);
+inline bool is_file_mentioned;
+inline std::string file_name;
 inline int current_col = 0;
 inline int current_row = 0;
