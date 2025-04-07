@@ -25,7 +25,7 @@ void utils::ClearScreen()
 }
 
 inline void ColorTerminalUser(){
-  write(STDOUT_FILENO, "\033[47m\033[30m", 10);
+  write(STDOUT_FILENO, "\033[32m", 5);
 }
 
 inline void SetTerminaltoDefaultColor()
@@ -45,23 +45,24 @@ inline void GoToMainTypingArea(const int& size)
   write(STDOUT_FILENO, "\033[H", 3);
 
   char str2[16];
-  int len2 = snprintf(str2, sizeof(str2), "\033[%d;%dH", current_col - 1, current_row + 1);
+  int len2 = snprintf(str2, sizeof(str2), "\033[%d;%dH", current_col, current_row + 1);
   write(STDOUT_FILENO, str2, len2);
 }
 
-void utils::CommitChanges()
+char utils::CommitChanges()
 {
   std::ofstream file_out;
 
   if (!is_file_mentioned)
   {
-    char str[9];
-    int len = snprintf(str, sizeof(str), "\033[%d;1H", ter.column);
+    char str[13];
+    int len = snprintf(str, sizeof(str), "\033[%d;1H\033[A", ter.column);
     write(STDOUT_FILENO, str, len);
-    write(STDOUT_FILENO, "\033[41m", 5);
-    //write(STDOUT_FILENO, "Ctrl + C to escape", 18);
-    //SetTerminaltoDefaultColor();
-    //write(STDOUT_FILENO, "\n\r\033[41m", 7);
+    write(STDOUT_FILENO, "\033[31m", 5);
+    write(STDOUT_FILENO, "Ctrl + C to escape", 18);
+    SetTerminaltoDefaultColor();
+    write(STDOUT_FILENO, "\n\r", 2);
+    write(STDOUT_FILENO, "\033[31m", 5);
     write(STDOUT_FILENO, "Name of the File: ", 18);
     ColorTerminalUser();
 
@@ -77,7 +78,7 @@ void utils::CommitChanges()
 	write(STDOUT_FILENO, str.c_str(), str.size());
       }
 
-      else if (c == DEL_KEY)
+      else if (c == DEL_KEY && file.size() > 0)
       {
         file.pop_back();
         SetTerminaltoDefaultColor();
@@ -88,15 +89,15 @@ void utils::CommitChanges()
       else if(c == CTRL_KEY('c'))
       {  
         GoToMainTypingArea(file.size());
-	return;
+	return -1;
       }
 
       c = KeyPress::ReadKey();
     }
-
+    file_name = file;
     file_out = std::ofstream(file);
     GoToMainTypingArea(file.size());   
-
+    is_file_mentioned = true;
   }
   
   else
@@ -109,4 +110,29 @@ void utils::CommitChanges()
   {
     file_out <<ref <<"\n";
   }	  
+
+  char str[10];
+  int len = snprintf(str, sizeof(str), "\033[%d;1H", ter.column);
+  write(STDOUT_FILENO, str, len);
+  write(STDOUT_FILENO, "\033[32m", 5);
+  
+  char str2[100];
+  int len2 = snprintf(str2, sizeof(str2), "Saved File in %s", file_name.c_str());
+  write(STDOUT_FILENO, str2, len2);
+  SetTerminaltoDefaultColor();
+  
+  char str3[16];
+  int len3 = snprintf(str3, sizeof(str3), "\033[%d;%dH\033[A", current_col, current_row + 1);
+  write(STDOUT_FILENO, str3, len3);
+
+  char c = KeyPress::ReadKey();
+   
+  char str4[10];
+  int len4 = snprintf(str4, sizeof(str4), "\033[%d;1H", ter.column);
+  write(STDOUT_FILENO, str4, len4);
+  std::string cpp_str(len2, ' ');
+  write(STDOUT_FILENO, cpp_str.c_str(), cpp_str.size());
+  write(STDOUT_FILENO, str3, len3);
+
+  return c;
 }

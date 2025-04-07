@@ -24,7 +24,7 @@ namespace utils{
   };
   
   std::string GetSpecificLine(const int& target_line, std::ifstream& file);
-  void CommitChanges();
+  char CommitChanges();
   void die(const char* errormsg);
   void ClearScreen();
 };

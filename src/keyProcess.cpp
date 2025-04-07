@@ -28,6 +28,9 @@ char KeyPress::ReadKey(){
 void KeyPress::ProcessKeyPress(){
   char c = ReadKey();
 
+
+RepeatKeyProcessing:
+
   if (31 < c && c < 127)
   {
     current_row++;
@@ -51,7 +54,9 @@ void KeyPress::ProcessKeyPress(){
     }
     case CTRL_KEY('s'): 
     {
-      utils::CommitChanges();
+      c = utils::CommitChanges();
+      if (c != -1)
+        goto RepeatKeyProcessing;
       break;
     }
 
@@ -162,7 +167,7 @@ void KeyPress::ProcessKeyPress(){
           // std::string num2 = "\033[" + std::to_string((lines.size() + 1) - current_col) + "A";
           char str2[7];
           int len2 = snprintf(str2, sizeof(str2), "\033[%dA", lines.size() + 1); 
-          write(STDOUT_FILENO, "\n\033\r[K", 5);
+          write(STDOUT_FILENO, "\n\r\033[K", 5);
           write(STDOUT_FILENO, str2, len2);
           write(STDOUT_FILENO, str, len);
 
