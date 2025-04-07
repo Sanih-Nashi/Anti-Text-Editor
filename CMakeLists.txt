@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(redis)
+project(anti)
 
 message(STATUS "Building ${PROJECT_NAME}")
 
@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CMAKE_CXX_EXTENSIONS OFF)  # Optional: Disable compiler-specific extensions like `gnu++`
 
 # Define your target
-add_executable(${PROJECT_NAME} src/reutils.cpp src/main.cpp)
+add_executable(${PROJECT_NAME} src/keyProcess.cpp src/terminal.cpp src/main.cpp src/antiutils.cpp src/rawMode.cpp)
 
 # Apply the compile options (target-specific)
 target_compile_options(${PROJECT_NAME} PRIVATE 
