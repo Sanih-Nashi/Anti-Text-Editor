@@ -121,8 +121,20 @@ char utils::CommitChanges()
   write(STDOUT_FILENO, str2, len2);
   SetTerminaltoDefaultColor();
   
-  char str3[16];
-  int len3 = snprintf(str3, sizeof(str3), "\033[%d;%dH\033[A", current_col, current_row + 1);
+  char str3[19];
+  int len3;
+  
+  if (current_col == 0)
+    len3 = snprintf(str3, sizeof(str3), "\033[H\033[%dC", current_row);
+  else if (current_row == 0)
+    len3 = snprintf(str3, sizeof(str3), "\033[H\033[%dB", current_col);
+  else if (current_col == 0 && current_row == 0)
+  {
+    len3 = snprintf(str3, sizeof(str3), "\033[H");
+  }
+  else
+    len3 = snprintf(str3, sizeof(str3), "\033[H\033[%dB\033[%dC", current_col, current_row);
+  
   write(STDOUT_FILENO, str3, len3);
 
   char c = KeyPress::ReadKey();
