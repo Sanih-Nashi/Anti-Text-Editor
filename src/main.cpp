@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
   RawMode::enableRawMode();
   utils::ClearScreen();
   initTerminal(&argv, argc);
-  while (true){
-   KeyPress::ProcessKeyPress();
-  }
+  while (true)
+    KeyPress::ProcessKeyPress();
+  utils::ClearScreen();
 }
