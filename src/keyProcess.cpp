@@ -79,6 +79,23 @@ RepeatKeyProcessing:
         current_col--;
         current_line--;
       }
+      
+      else if (current_col == 0 && current_line > 0)
+      {
+	write(STDOUT_FILENO, "\033[H", 3);
+        for (int i = --current_line; i < current_line + USABLE_TER_COL; i++)
+	{
+          write(STDOUT_FILENO, "\033[K", 3);
+	  write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
+	}
+	write(STDOUT_FILENO, "\033[H", 3);
+	if (current_row != 0)
+	{
+	  char str[22];
+	  int len = snprintf(str, sizeof(str), "\033[%dC", current_row);
+	}
+      }
+	  	
       break;
     }
     case CTRL_KEY('j'): 
@@ -190,7 +207,7 @@ RepeatKeyProcessing:
       lines[current_line + 1] = lines[current_line + 1].substr(current_row, lines[current_line + 1].size() - 1);
 
       write(STDOUT_FILENO, "\033[K", 3);
-      for (int i = current_line + 1; i < (current_line + 1 + USABLE_TER_COL) && i < lines.size(); i++)
+      for (int i = current_line + 1; i < (current_line + 1) + (USABLE_TER_COL - current_col) && i < lines.size(); i++)
       {
         write(STDOUT_FILENO, "\n\r\033[K", 5);
         write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
