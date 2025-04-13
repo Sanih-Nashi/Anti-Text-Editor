@@ -150,9 +150,8 @@ RepeatKeyProcessing:
         {
           int size = lines[current_col - 1].size();
           // std::string num = "\033[" + std::to_string(size) + "C";
-          char str[7];
-          int len = snprintf(str, sizeof(str), "\033[%dC", size); 
-          lines[current_col - 1] = lines[current_col - 1] + lines[current_col];
+          
+	  lines[current_col - 1] = lines[current_col - 1] + lines[current_col];
           lines.erase(lines.begin() + current_col--);
           current_row = size;
 
@@ -165,10 +164,12 @@ RepeatKeyProcessing:
           }      
 
           // std::string num2 = "\033[" + std::to_string((lines.size() + 1) - current_col) + "A";
+          write(STDOUT_FILENO, "\n\r\033[K\033[H", 8);
           char str2[7];
-          int len2 = snprintf(str2, sizeof(str2), "\033[%dA", lines.size() + 1); 
-          write(STDOUT_FILENO, "\n\r\033[K", 5);
+          int len2 = snprintf(str2, sizeof(str2), "\033[%dB", current_col); 
           write(STDOUT_FILENO, str2, len2);
+          char str[7];
+          int len = snprintf(str, sizeof(str), "\033[%dC", size); 
           write(STDOUT_FILENO, str, len);
 
 
