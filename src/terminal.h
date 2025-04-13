@@ -19,3 +19,4 @@ inline bool is_file_mentioned;
 inline std::string file_name;
 inline int current_col = 0;
 inline int current_row = 0;
+inline int current_line = 0;

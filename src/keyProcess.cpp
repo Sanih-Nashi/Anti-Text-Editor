@@ -34,9 +34,9 @@ RepeatKeyProcessing:
   if (31 < c && c < 127)
   {
     current_row++;
-    lines[current_col].insert(current_row - 1, std::string(1, c));
+    lines[current_line].insert(current_row - 1, std::string(1, c));
     write(STDOUT_FILENO, "\r", 1);
-    write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
+    write(STDOUT_FILENO, lines[current_line].c_str(), lines[current_line].size());
     write(STDOUT_FILENO, "\r", 1);
     char str[7];
     int len = snprintf(str, sizeof(str), "\033[%dC", current_row);
@@ -70,28 +70,29 @@ RepeatKeyProcessing:
         else
         {
 	  char str[11];
-	  int size = lines[current_col - 1].size();
+	  int size = lines[current_line - 1].size();
 	  int len = snprintf(str, sizeof(str), "\033[A\r\033[%dC", size);
           write(STDOUT_FILENO, str, len);
           current_row = size;
         }
 
         current_col--;
+        current_line--;
       }
       break;
     }
     case CTRL_KEY('j'): 
     {
 
-      if (current_col < Tl::GetTerminalColumn() && current_col < lines.size() - 1)
+      if (current_col < USABLE_TER_COL && current_line < lines.size() - 1)
       {
         
-        if (current_row <= lines[current_col + 1].size()) 
+        if (current_row <= lines[current_line + 1].size()) 
           write(STDOUT_FILENO, "\n", 1);
 
         else
         {
-	  int size = lines[current_col + 1].size();
+	  int size = lines[current_line + 1].size();
 	  if (size != 0)
 	  {
 	    char str[9];
@@ -99,13 +100,12 @@ RepeatKeyProcessing:
 	    write(STDOUT_FILENO, str, len);
 	  }
 	  else
-    {
-      write(STDOUT_FILENO, "\n\r", 2);
-	  }
+            write(STDOUT_FILENO, "\n\r", 2);
 
 	  current_row = lines[current_col + 1].size();
         }
         current_col++;
+        current_line++;
       }
       break;
     }
@@ -132,9 +132,9 @@ RepeatKeyProcessing:
     { 
       if (current_row != 0)
       {
-        lines[current_col].erase(--current_row, 1);
+        lines[current_line].erase(--current_row, 1);
         write(STDOUT_FILENO, "\r\033[K", 4);
-        write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
+        write(STDOUT_FILENO, lines[current_line].c_str(), lines[current_line].size());
   	    write(STDOUT_FILENO, "\r", 1);
 	      if (current_row != 0){
           // std::string row = "\033[" + std::to_string(current_row) + "C";
@@ -148,15 +148,16 @@ RepeatKeyProcessing:
       {  
         if (current_col != 0)
         {
-          int size = lines[current_col - 1].size();
+          int size = lines[current_line - 1].size();
           // std::string num = "\033[" + std::to_string(size) + "C";
           
-	  lines[current_col - 1] = lines[current_col - 1] + lines[current_col];
-          lines.erase(lines.begin() + current_col--);
+	  lines[current_line - 1] = lines[current_line - 1] + lines[current_line];
+          lines.erase(lines.begin() + current_line--);
+	  current_col--;
           current_row = size;
 
           write(STDOUT_FILENO, "\033[A", 3);
-          write(STDOUT_FILENO, lines[current_col].c_str(), lines[current_col].size());
+          write(STDOUT_FILENO, lines[current_line].c_str(), lines[current_line].size());
 
           for (int i = current_col + 1; i < lines.size(); i++){
             write(STDOUT_FILENO, "\n\r\033[K", 5);
@@ -165,13 +166,18 @@ RepeatKeyProcessing:
 
           // std::string num2 = "\033[" + std::to_string((lines.size() + 1) - current_col) + "A";
           write(STDOUT_FILENO, "\n\r\033[K\033[H", 8);
-          char str2[7];
-          int len2 = snprintf(str2, sizeof(str2), "\033[%dB", current_col); 
-          write(STDOUT_FILENO, str2, len2);
-          char str[7];
+	  if (current_col != 0 )
+	  {
+            char str2[7];
+            int len2 = snprintf(str2, sizeof(str2), "\033[%dB", current_col);  
+	    write(STDOUT_FILENO, str2, len2);
+	  }
+	  if (current_row != 0)
+	  {
+	  char str[7];
           int len = snprintf(str, sizeof(str), "\033[%dC", size); 
           write(STDOUT_FILENO, str, len);
-
+	  }
 
         }  
       }
@@ -180,21 +186,22 @@ RepeatKeyProcessing:
 
     case ENTER_KEY:
     {
-      lines.insert(lines.begin() + current_col, lines[current_col].substr(0, current_row));
-      lines[current_col + 1] = lines[current_col + 1].substr(current_row, lines[current_col + 1].size() - 1);
+      lines.insert(lines.begin() + current_line, lines[current_line].substr(0, current_row));
+      lines[current_line + 1] = lines[current_line + 1].substr(current_row, lines[current_line + 1].size() - 1);
 
       write(STDOUT_FILENO, "\033[K", 3);
-      for (int i = current_col + 1; i < lines.size(); i++)
+      for (int i = current_line + 1; i < (current_line + 1 + USABLE_TER_COL) && i < lines.size(); i++)
       {
         write(STDOUT_FILENO, "\n\r\033[K", 5);
         write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
       }        
       // std::string num = "\033[" + std::to_string(lines.size() - current_col -1) + "A";
       char str[7];
-      int len = snprintf(str, sizeof(str), "\033[%dA", lines.size() - current_col - 1); 
+      int len = snprintf(str, sizeof(str), "\033[%dA", lines.size() - current_line - 1); 
       write(STDOUT_FILENO, "\n\r\033[K", 5);
       write(STDOUT_FILENO, str, len);
       current_col++;
+      current_line++;
       current_row = 0;
       break;
     }
