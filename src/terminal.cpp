@@ -64,15 +64,17 @@ void initTerminal(char*** argv, const int& argc) {
     std::cout <<"error opening file";
     exit(1);
   }
+  write(STDOUT_FILENO, "\033[H", 3);
   std::string buffer;
   for (int i = 0; std::getline(file_in, buffer); i++)
   {
     lines.push_back(buffer);
-    if (i < Tl::GetTerminalRow())
+    if (i < ter.row)
     {
       write(STDOUT_FILENO, buffer.c_str(), buffer.size());
       write(STDOUT_FILENO, "\n\r", 2);
     }
   }
   write(STDOUT_FILENO, "\033[H", 3);
+
 }

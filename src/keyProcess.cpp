@@ -124,6 +124,26 @@ RepeatKeyProcessing:
         current_col++;
         current_line++;
       }
+
+      else if (current_col == USABLE_TER_COL && current_line < lines.size() -1)
+      {
+	write(STDOUT_FILENO, "\033[H", 3);
+	for (int i = ++current_line - USABLE_TER_COL + 1; i <= current_line; i++)
+	{
+	  write(STDOUT_FILENO, "\033[K", 3);
+	  write(STDOUT_FILENO, lines[i].c_str(), lines[i].size()); 
+	}
+	if (current_col != 0)
+	{
+	  char str[22];
+	  int len = snprintf(str, sizeof(str), "\033[%dC", current_col);
+	  write(STDOUT_FILENO, str, len);
+        }
+	else
+	  write(STDOUT_FILENO, "\r", 1);
+
+      }
+
       break;
     }
     case CTRL_KEY('h'): 
