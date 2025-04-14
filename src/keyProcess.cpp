@@ -9,6 +9,31 @@
 #include "antiutils.h"
 #include "terminal.h"
 
+#ifdef DEV_DEBUG
+inline void StateLine()
+{
+  char str[22];
+  int len = snprintf(str, sizeof(str), "\033[%d;1H", ter.column);
+  write(STDOUT_FILENO, str, len);
+
+  len = snprintf(str, sizeof(str), "%d, %d", current_line, current_col);
+  write(STDOUT_FILENO, str, len);
+
+  if (current_row == 0 && current_col != 0)
+    len = snprintf(str, sizeof(str), "\033[H\033[%dC", current_col);
+  else if (current_row != 0 && current_col == 0)
+    len = snprintf(str, sizeof(str), "\033[H\033[%dB", current_row);
+  else if (current_row == 0 && current_col == 0)
+    len = snprintf(str, sizeof(str), "\033[H");
+  else
+    len = snprintf(str, sizeof(str), "\033[H\033[%dB\033[%dC", current_row, current_col);
+
+
+
+  write(STDOUT_FILENO, str, len);
+
+}
+#endif
 
 char KeyPress::ReadKey(){
   int read_num;
@@ -52,6 +77,15 @@ RepeatKeyProcessing:
 
       exit(0);
     }
+#ifdef DEV_DEBUG
+    case CTRL_KEY('d'):
+    {
+      char str[22];
+      int len = snprintf(str, sizeof(str), "\nrow: %d, col: %d\n", current_line + 1, current_col + 1);
+      write(STDOUT_FILENO, str, len);
+      break;
+    } 
+#endif
     case CTRL_KEY('s'): 
     {
       c = utils::CommitChanges();
@@ -113,14 +147,14 @@ RepeatKeyProcessing:
 	       int size = lines[current_line + 1].size();
 	       if (size != 0)
 	       {
-	         char str[9];
-	         int len = snprintf(str, sizeof(str), "\n\r\033[%dC", size); 
-	          write(STDOUT_FILENO, str, len);
-	        }
+	        char str[9];
+	        int len = snprintf(str, sizeof(str), "\n\r\033[%dC", size); 
+	        write(STDOUT_FILENO, str, len);
+	       }
 	        else
             write(STDOUT_FILENO, "\n\r", 2);
 
-	        current_col = lines[current_row + 1].size();
+	        current_col = lines[current_line + 1].size();
         }
         current_row++;
         current_line++;
@@ -128,24 +162,42 @@ RepeatKeyProcessing:
 
       else if (current_row == USABLE_TER_ROW - 1 && current_line < lines.size() -1)
       {
-    	write(STDOUT_FILENO, "\033[H", 3);
-      write(STDOUT_FILENO, "\033[K", 3);
-	    for (int i = ++current_line - USABLE_TER_ROW + 1; i <= current_line; i++)
-	    {
-	      write(STDOUT_FILENO, lines[i].c_str(), lines[i].size()); 
-        write(STDOUT_FILENO, "\n\r\033[K", 5);
-	    }
-      write(STDOUT_FILENO, "\033[A", 3);
-	    if (current_col != 0)
-	    {
-	      char str[22];
-	      int len = snprintf(str, sizeof(str), "\033[%dC", current_col);
-	      write(STDOUT_FILENO, str, len);
-      }
-	    else
-	      write(STDOUT_FILENO, "\r", 1);
+    	  write(STDOUT_FILENO, "\033[H", 3);
+        write(STDOUT_FILENO, "\033[K", 3);
+	      for (int i = ++current_line - USABLE_TER_ROW + 1; i <= current_line; i++)
+	      {
+	        write(STDOUT_FILENO, lines[i].c_str(), lines[i].size()); 
+          write(STDOUT_FILENO, "\n\r\033[K", 5);
+	      }
+        write(STDOUT_FILENO, "\033[A\r", 4);
+        
+        if(current_col <= lines[current_line].size()){
+          if (current_col != 0)
+          {
+            char str[22];
+            int len = snprintf(str, sizeof(str), "\033[%dC", current_col);
+            write(STDOUT_FILENO, str, len);
+          }
+          else
+            write(STDOUT_FILENO, "\r", 1);
 
-      }
+        }
+
+        else
+        {
+          if (lines[current_line].size() != 0)
+          {
+            char str[22];
+            int len = snprintf(str, sizeof(str), "\033[%dC", lines[current_col].size());
+            write(STDOUT_FILENO, str, len);
+          }
+          else
+            write(STDOUT_FILENO, "\r", 1);
+
+          current_col = lines[current_col].size();
+        }
+
+        }
 
       break;
     }
@@ -175,7 +227,7 @@ RepeatKeyProcessing:
         lines[current_line].erase(--current_col, 1);
         write(STDOUT_FILENO, "\r\033[K", 4);
         write(STDOUT_FILENO, lines[current_line].c_str(), lines[current_line].size());
-  	write(STDOUT_FILENO, "\r", 1);
+  	    write(STDOUT_FILENO, "\r", 1);
         if (current_col != 0){
           // std::string row = "\033[" + std::to_string(current_col) + "C";
           char str[7];
@@ -245,4 +297,7 @@ RepeatKeyProcessing:
     }
       
   }
+#ifdef DEV_DEBUG
+  StateLine();
+#endif
 }
