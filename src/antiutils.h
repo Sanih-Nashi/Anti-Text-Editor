@@ -30,4 +30,4 @@ namespace utils{
 };
 
 inline struct utils::Terminal ter;
-#define USABLE_TER_COL (ter.column - 2)
+#define USABLE_TER_ROW (ter.row - 2)

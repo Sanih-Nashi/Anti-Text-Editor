@@ -45,7 +45,7 @@ inline void GoToMainTypingArea(const int& size)
   write(STDOUT_FILENO, "\033[H", 3);
 
   char str2[16];
-  int len2 = snprintf(str2, sizeof(str2), "\033[%d;%dH", current_col, current_row + 1);
+  int len2 = snprintf(str2, sizeof(str2), "\033[%d;%dH", current_row, current_col + 1);
   write(STDOUT_FILENO, str2, len2);
 }
 
@@ -74,22 +74,22 @@ char utils::CommitChanges()
       if (31 < c && c < 127)
       {
         file.push_back(c);
-	std::string str = std::string(1, c);
-	write(STDOUT_FILENO, str.c_str(), str.size());
+	      std::string str = std::string(1, c);
+      	write(STDOUT_FILENO, str.c_str(), str.size());
       }
 
       else if (c == DEL_KEY && file.size() > 0)
       {
         file.pop_back();
         SetTerminaltoDefaultColor();
-	write(STDOUT_FILENO, "\b \b", 3);
-	ColorTerminalUser();
+	      write(STDOUT_FILENO, "\b \b", 3);
+	      ColorTerminalUser();
       }
 
       else if(c == CTRL_KEY('c'))
       {  
         GoToMainTypingArea(file.size());
-	return -1;
+	      return -1;
       }
 
       c = KeyPress::ReadKey();
@@ -114,7 +114,7 @@ char utils::CommitChanges()
   char str[10];
   int len = snprintf(str, sizeof(str), "\033[%d;1H", ter.column);
   write(STDOUT_FILENO, str, len);
-  write(STDOUT_FILENO, "\033[32m", 5);
+  write(STDOUT_FILENO, "\033[32m", 5); //sets color to green
   
   char str2[100];
   int len2 = snprintf(str2, sizeof(str2), "Saved File in %s", file_name.c_str());
@@ -124,16 +124,16 @@ char utils::CommitChanges()
   char str3[19];
   int len3;
   
-  if (current_col == 0)
-    len3 = snprintf(str3, sizeof(str3), "\033[H\033[%dC", current_row);
-  else if (current_row == 0)
-    len3 = snprintf(str3, sizeof(str3), "\033[H\033[%dB", current_col);
-  else if (current_col == 0 && current_row == 0)
+  if (current_row == 0)
+    len3 = snprintf(str3, sizeof(str3), "\033[H\033[%dC", current_col);
+  else if (current_col == 0)
+    len3 = snprintf(str3, sizeof(str3), "\033[H\033[%dB", current_row);
+  else if (current_row == 0 && current_col == 0)
   {
     len3 = snprintf(str3, sizeof(str3), "\033[H");
   }
   else
-    len3 = snprintf(str3, sizeof(str3), "\033[H\033[%dB\033[%dC", current_col, current_row);
+    len3 = snprintf(str3, sizeof(str3), "\033[H\033[%dB\033[%dC", current_row, current_col);
   
   write(STDOUT_FILENO, str3, len3);
 

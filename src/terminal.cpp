@@ -69,7 +69,7 @@ void initTerminal(char*** argv, const int& argc) {
   for (int i = 0; std::getline(file_in, buffer); i++)
   {
     lines.push_back(buffer);
-    if (i < ter.row)
+    if (i < USABLE_TER_ROW)
     {
       write(STDOUT_FILENO, buffer.c_str(), buffer.size());
       write(STDOUT_FILENO, "\n\r", 2);
