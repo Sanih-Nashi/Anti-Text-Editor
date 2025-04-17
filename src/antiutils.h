@@ -12,6 +12,7 @@
 #define DEL_KEY 127
 #define ENTER_KEY 13
 
+#define DEV_DEBUG
 
 namespace utils{
   

@@ -10,14 +10,20 @@
 #include "terminal.h"
 
 #ifdef DEV_DEBUG
+
+static int state_line_len;
+
 inline void StateLine()
 {
   char str[22];
   int len = snprintf(str, sizeof(str), "\033[%d;1H", ter.column);
   write(STDOUT_FILENO, str, len);
 
-  len = snprintf(str, sizeof(str), "%d, %d", current_line, current_col);
-  write(STDOUT_FILENO, str, len);
+  write(STDOUT_FILENO, std::string(state_line_len, ' ').c_str(), state_line_len);
+  write(STDOUT_FILENO, "\r", 1);
+
+  state_line_len = snprintf(str, sizeof(str), "%d, %d", current_line + 1, current_col);
+  write(STDOUT_FILENO, str, state_line_len);
 
   if (current_row == 0 && current_col != 0)
     len = snprintf(str, sizeof(str), "\033[H\033[%dC", current_col);

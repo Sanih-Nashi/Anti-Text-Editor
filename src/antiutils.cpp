@@ -142,8 +142,8 @@ char utils::CommitChanges()
   char str4[10];
   int len4 = snprintf(str4, sizeof(str4), "\033[%d;1H", ter.column);
   write(STDOUT_FILENO, str4, len4);
-  std::string cpp_str(len2, ' ');
-  write(STDOUT_FILENO, cpp_str.c_str(), cpp_str.size());
+  // std::string cpp_str(len2, ' ');
+  write(STDOUT_FILENO, std::string(len2, ' ').c_str(), len2);
   write(STDOUT_FILENO, str3, len3);
 
   return c;
