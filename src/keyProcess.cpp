@@ -251,23 +251,26 @@ RepeatKeyProcessing:
           write(STDOUT_FILENO, "\033[A", 3);
           write(STDOUT_FILENO, lines[current_line].c_str(), lines[current_line].size());
 
-          for (int i = current_line + 1; i < (current_line - current_row) + USABLE_TER_ROW; i++){
+          for (int i = current_line + 1;
+               i < (current_line - current_row) + USABLE_TER_ROW && i < lines.size();
+              i++)
+            {
             write(STDOUT_FILENO, "\n\r\033[K", 5);
             write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
           }      
 
           write(STDOUT_FILENO, "\n\r\033[K\033[H", 8);
-	  if (current_row != 0 )
-	  {
+	        if (current_row != 0 )
+	        {
             char str2[7];
             int len2 = snprintf(str2, sizeof(str2), "\033[%dB", current_row);  
-	    write(STDOUT_FILENO, str2, len2);
-	  }
-	  if (current_col != 0)
-	  {
-	    char str[7];
-      int len = snprintf(str, sizeof(str), "\033[%dC", size); 
-      write(STDOUT_FILENO, str, len);
+	          write(STDOUT_FILENO, str2, len2);
+	         }
+	         else if (current_col != 0)
+	         {
+	          char str[7];
+            int len = snprintf(str, sizeof(str), "\033[%dC", size); 
+            write(STDOUT_FILENO, str, len);
 	  }
 
         }  
