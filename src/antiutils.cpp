@@ -59,7 +59,7 @@ char utils::CommitChanges()
     int len = snprintf(str, sizeof(str), "\033[%d;1H\033[A", ter.column);
     write(STDOUT_FILENO, str, len);
     write(STDOUT_FILENO, "\033[31m", 5);
-    write(STDOUT_FILENO, "Ctrl + C to escape", 18);
+    write(STDOUT_FILENO, "Ctrl + C to cancel", 18);
     SetTerminaltoDefaultColor();
     write(STDOUT_FILENO, "\n\r", 2);
     write(STDOUT_FILENO, "\033[31m", 5);
