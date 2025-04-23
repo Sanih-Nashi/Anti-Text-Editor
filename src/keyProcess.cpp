@@ -268,12 +268,12 @@ RepeatKeyProcessing:
             int len2 = snprintf(str2, sizeof(str2), "\033[%dB", current_row);
 	          write(STDOUT_FILENO, str2, len2);
 	         }
-	         else if (current_col != 0)
-	         {
+	        else if (current_col != 0)
+	        {
 	          char str[7];
             int len = snprintf(str, sizeof(str), "\033[%dC", size);
             write(STDOUT_FILENO, str, len);
-	  }
+	        }
 
         }
       }
