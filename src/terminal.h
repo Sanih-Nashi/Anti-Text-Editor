@@ -12,6 +12,7 @@ namespace Tl{
   int GetTerminalColumn();
   int GetTerminalSize(int& row, int& column);
 }
+void AlignTer();
 void initTerminal(char ***argv, const int& argc);
 
 inline std::vector<std::string> lines;

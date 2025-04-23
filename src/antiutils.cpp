@@ -33,7 +33,7 @@ inline void SetTerminaltoDefaultColor()
   write(STDOUT_FILENO, "\033[0m", 4);
 }
 
-inline void GoToMainTypingArea(const int& size)
+void utils::GoToMainTypingArea(const int& size)
 {
  
   std::string rp_string(18 + size, ' ');

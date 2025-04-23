@@ -40,13 +40,41 @@ int Tl::GetTerminalSize(int& row, int& column){
   }
 }
 
+void AlignTer()
+{
+  if (Tl::GetTerminalSize(ter.row, ter.column) == -1)
+    utils::die("cannot get terminal size");
+
+  write(STDOUT_FILENO, "\033[2J\033[H", 7);
+  for (int i = current_line - current_row; i < current_line + USABLE_TER_ROW - current_row 
+      && i < lines.size() ; i++)
+  {
+    write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
+    write(STDOUT_FILENO, "\n\r", 2);
+  }
+  write(STDOUT_FILENO, "\033[H", 3);
+  char str[19];
+  int len;
+  
+  if (current_row == 0)
+    len = snprintf(str, sizeof(str), "\033[H\033[%dC", current_col);
+  else if (current_col == 0)
+    len = snprintf(str, sizeof(str), "\033[H\033[%dB", current_row);
+  else if (current_row == 0 && current_col == 0)
+  {
+    len = snprintf(str, sizeof(str), "\033[H");
+  }
+  else
+    len = snprintf(str, sizeof(str), "\033[H\033[%dB\033[%dC", current_row, current_col);
+  
+  write(STDOUT_FILENO, str, len);
+ 
+}
 
 void initTerminal(char*** argv, const int& argc) {
     
   if (Tl::GetTerminalSize(ter.row, ter.column) == -1) 
     utils::die("getWindowSize");
-  ter.cx = 0;
-  ter.cy = 0;
   
   if (argc < 2)
   {

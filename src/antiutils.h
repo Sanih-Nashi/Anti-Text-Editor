@@ -12,14 +12,13 @@
 #define DEL_KEY 127
 #define ENTER_KEY 13
 
-#define DEV_DEBUG
+// #define DEV_DEBUG
 
 namespace utils{
   
   struct Terminal{
     int row;
     int column;
-    int cx, cy; 
     struct termios orig_setting;
 
   };
@@ -28,6 +27,7 @@ namespace utils{
   char CommitChanges();
   void die(const char* errormsg);
   void ClearScreen();
+  void GoToMainTypingArea(const int& size);
 };
 
 inline struct utils::Terminal ter;

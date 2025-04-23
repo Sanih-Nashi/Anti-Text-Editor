@@ -40,10 +40,6 @@ inline void StateLine()
 char KeyPress::ReadKey(){
   int read_num;
   char c;
-  char buffer[32];
-  snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", ter.cy + 1, ter.cx + 1);
-  ter.cy++;
-  ter.cx++;
   while ( (read_num = read(STDIN_FILENO, &c, 1)) != 1) 
   {
     if (read_num == -1 && errno != EAGAIN)
@@ -88,6 +84,13 @@ RepeatKeyProcessing:
       break;
     } 
 #endif
+
+    case CTRL_KEY('a'):
+    {
+      AlignTer();
+      break;
+    }
+
     case CTRL_KEY('s'):
     {
       c = utils::CommitChanges();
@@ -254,9 +257,9 @@ RepeatKeyProcessing:
           write(STDOUT_FILENO, lines[current_line].c_str(), lines[current_line].size());
 
           for (int i = current_line + 1;
-               i < (current_line - current_row) + USABLE_TER_ROW && i < lines.size();
+              i < (current_line - current_row) + USABLE_TER_ROW && i < lines.size();
               i++)
-            {
+          {
             write(STDOUT_FILENO, "\n\r\033[K", 5);
             write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
           }
@@ -267,7 +270,7 @@ RepeatKeyProcessing:
             char str2[7];
             int len2 = snprintf(str2, sizeof(str2), "\033[%dB", current_row);
 	          write(STDOUT_FILENO, str2, len2);
-	         }
+	        }
 	        else if (current_col != 0)
 	        {
 	          char str[7];
