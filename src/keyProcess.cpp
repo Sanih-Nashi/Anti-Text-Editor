@@ -276,6 +276,28 @@ RepeatKeyProcessing:
 	        }
 
         }
+        else if (current_line > 0)
+        {
+          int size = lines[current_line - 1].size();
+
+	        lines[current_line - 1] = lines[current_line - 1] + lines[current_line];
+          lines.erase(lines.begin() + current_line--);
+          current_col = size;
+          write(STDOUT_FILENO, "\033[H", 3);
+          write(STDOUT_FILENO, lines[current_line].c_str(), lines[current_line].size());
+          for (int i = current_line + 1; i < current_line + USABLE_TER_ROW && i < lines.size(); i++)
+          {
+            write(STDOUT_FILENO, "\n\r\033[K", 5);
+            write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
+          }
+          write(STDOUT_FILENO, "\033[H", 3);
+          if (size  > 0)
+          {
+            char str[22];
+            int len = snprintf(str, sizeof(str), "\033[%dC", size);
+            write(STDOUT_FILENO, str, len);
+          }
+        }
       }
       break;
     }
@@ -301,14 +323,13 @@ RepeatKeyProcessing:
       }
       else
       {
-        write(STDOUT_FILENO, "\033[H", 3);
-        write(STDOUT_FILENO, lines[current_line - USABLE_TER_ROW + 1].c_str()
-        ,lines[current_line - USABLE_TER_ROW + 2].size());
-        for (int i = current_line - USABLE_TER_ROW + 3; i <= current_line + 1; i++)
+        write(STDOUT_FILENO, "\033[H\033[K", 6);
+        for (int i = current_line - USABLE_TER_ROW + 2; i <= current_line; i++)
         {
-	  write(STDOUT_FILENO, "\n\r\033[K", 5);
           write(STDOUT_FILENO, lines[i].c_str(), lines[i].size());
+	        write(STDOUT_FILENO, "\n\r\033[K", 5);
         }
+        write(STDOUT_FILENO, lines[current_line + 1].c_str(), lines[current_line + 1].size()); //last line
         write(STDOUT_FILENO, "\r", 1);
       }
       current_line++;
